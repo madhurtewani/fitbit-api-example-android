@@ -1,49 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-    </data>
+    <data></data>
 
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
         tools:context="com.fitbit.authentication.ui.LoginActivity">
 
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="center_horizontal|center_vertical|center"
-            android:orientation="vertical"
-            android:padding="@dimen/activity_horizontal_margin">
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/activity_horizontal_margin"
-                android:text="@string/logging_you_into_fitbit"/>
-
-        </LinearLayout>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/app_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:subtitleTextAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle.Small"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
         <WebView
             android:id="@+id/login_webview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/app_toolbar" />
 
-        </WebView>
+        <android.support.v4.widget.ContentLoadingProgressBar
+            android:id="@+id/pb_page_load"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/progress_height"
+            android:indeterminate="false"
+            app:layout_constraintBottom_toBottomOf="@+id/app_toolbar" />
 
-
-    </RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
 </layout>

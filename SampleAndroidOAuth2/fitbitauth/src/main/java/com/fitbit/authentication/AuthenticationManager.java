@@ -1,15 +1,14 @@
 package com.fitbit.authentication;
 
-import com.fitbit.authentication.ui.LoginActivity;
-import com.fitbit.fitbitcommon.network.BasicHttpRequestBuilder;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.android.annotations.Nullable;
+import com.fitbit.authentication.ui.LoginActivity;
+import com.fitbit.fitbitcommon.network.BasicHttpRequestBuilder;
 import com.sveinungkb.SecurePreferences;
 
 import java.util.HashSet;

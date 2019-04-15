@@ -1,13 +1,5 @@
 package com.fitbit.authentication.ui;
 
-import com.fitbit.authentication.AuthenticationHandler;
-import com.fitbit.authentication.AuthenticationResult;
-import com.fitbit.authentication.AuthorizationController;
-import com.fitbit.authentication.ClientCredentials;
-import com.fitbit.authentication.Scope;
-import com.fitbit.fitbitauth.R;
-import com.fitbit.fitbitauth.databinding.ActivityLoginBinding;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -15,10 +7,21 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
-import com.android.annotations.Nullable;
+import com.fitbit.authentication.AuthenticationHandler;
+import com.fitbit.authentication.AuthenticationResult;
+import com.fitbit.authentication.AuthorizationController;
+import com.fitbit.authentication.ClientCredentials;
+import com.fitbit.authentication.Scope;
+import com.fitbit.fitbitauth.R;
+import com.fitbit.fitbitauth.databinding.ActivityLoginBinding;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -53,6 +56,8 @@ public class LoginActivity extends AppCompatActivity implements AuthenticationHa
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
 
+        setCustomActionBar();
+
         ClientCredentials clientCredentials = getIntent().getParcelableExtra(CLIENT_CREDENTIALS_KEY);
         Long expiresIn = getIntent().getLongExtra(EXPIRES_IN_KEY, 604800);
         Parcelable[] scopes = getIntent().getParcelableArrayExtra(SCOPES_KEY);
@@ -61,13 +66,32 @@ public class LoginActivity extends AppCompatActivity implements AuthenticationHa
             scopesSet.add((Scope) scope);
         }
 
+        binding.loginWebview.setWebChromeClient(new MyWebChromeClient());
+        binding.loginWebview.setWebViewClient(new MyWebViewClient());
+
         AuthorizationController authorizationController = new AuthorizationController(
                 binding.loginWebview,
                 clientCredentials,
                 this);
 
+        binding.pbPageLoad.show();
+
         authorizationController.authenticate(expiresIn, scopesSet);
 
+    }
+
+    private void setCustomActionBar() {
+        setSupportActionBar(binding.appToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        binding.appToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override
@@ -79,5 +103,43 @@ public class LoginActivity extends AppCompatActivity implements AuthenticationHa
         resultIntent.putExtra(CONFIGURATION_VERSION, getIntent().getIntExtra(CONFIGURATION_VERSION, 0));
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
+    }
+
+    class MyWebChromeClient extends WebChromeClient {
+
+        @Override
+        public void onReceivedTitle(WebView view, String title) {
+            super.onReceivedTitle(view, title);
+            getSupportActionBar().setTitle(title);
+            getSupportActionBar().setSubtitle(view.getUrl());
+        }
+
+        @Override
+        public void onProgressChanged(WebView view, int newProgress) {
+            super.onProgressChanged(view, newProgress);
+            binding.pbPageLoad.setProgress(newProgress);
+
+            if (newProgress >= 100) {
+                binding.pbPageLoad.hide();
+            }
+        }
+    }
+
+    class MyWebViewClient extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            if (view != null && request != null) {
+                binding.pbPageLoad.show();
+                binding.loginWebview.loadUrl(request.getUrl().toString());
+                getSupportActionBar().setSubtitle("");
+                getSupportActionBar().setTitle(request.getUrl().toString());
+            }
+            return super.shouldOverrideUrlLoading(view, request);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }
